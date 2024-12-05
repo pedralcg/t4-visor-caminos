@@ -1,0 +1,42 @@
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+}
+
+#menu-bar {
+  background-color: #1a73e8; /* Azul moderno */
+  color: white;
+  padding: 5px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#menu-bar h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+#credits {
+  margin-left: auto;
+  font-size: 14px;
+}
+
+#credits a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+#credits a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+#map {
+  width: 100%;
+  height: calc(100vh - 40px); /* Ajuste para compensar la altura del menú */
+}
