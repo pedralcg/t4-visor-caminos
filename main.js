@@ -8,8 +8,8 @@ import TileWMS from 'ol/source/TileWMS';
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import OSM from 'ol/source/OSM';
-import { defaults as defaultControls, OverviewMap, ZoomToExtent } from 'ol/control';
-import { fromLonLat } from 'ol/proj';
+import { defaults as defaultControls, OverviewMap, Control } from 'ol/control';
+import { fromLonLat, transformExtent } from 'ol/proj';
 import { Group as LayerGroup } from 'ol/layer';
 import LayerSwitcher from 'ol-layerswitcher';
 import { Style, Stroke } from 'ol/style';
@@ -47,7 +47,7 @@ const mtn50BaseLayer = new TileLayer({
   type: 'base'
 });
 
-///// Capa de los Caminos de Santiago
+// Capa de los Caminos de Santiago
 const caminosSource = new VectorSource({
   url: './data/caminos_santiago.geojson',
   format: new GeoJSON()
@@ -84,6 +84,22 @@ const caminosLayer = new VectorLayer({
   }
 });
 
+// Estilo line_black para el mapa guía
+const lineBlackStyle = new Style({
+  stroke: new Stroke({
+    color: 'red',
+    width: 1,
+    lineDash: [4, 8] // Opcional: líneas punteadas
+  })
+});
+
+// Capa de caminos de Santiago para el mapa guía
+const caminosLayerGuide = new VectorLayer({
+  source: caminosSource, // Reutilizamos la misma fuente
+  style: lineBlackStyle, // Aplicamos el estilo line_black
+  title: 'Caminos de Santiago (Mapa guía)'
+});
+
 // Agrupación de capas base
 const baseLayerGroup = new LayerGroup({
   title: 'Capas Base',
@@ -92,10 +108,15 @@ const baseLayerGroup = new LayerGroup({
 
 // Vista del mapa
 const mapView = new View({
-  center: fromLonLat([-3.70379, 40.41678]),
-  zoom: 6,
-  extent: fromLonLat([-9.27, 35.94]).concat(fromLonLat([4.32, 43.79]))
+  center: fromLonLat([-3.7, 40]), // Aproximadamente el centro de España
+  zoom: 6.8, // Ajustar para mostrar España completamente
+  maxZoom: 15,
+  minZoom: 6
 });
+
+// Extensiones geográficas
+const spainExtent = transformExtent([-11.0, 35.0, 5.0, 44.0], 'EPSG:4326', 'EPSG:3857');
+const laCorunaExtent = transformExtent([-8.75, 42.70, -7.8, 43.45], 'EPSG:4326', 'EPSG:3857');
 
 // Configuración del mapa
 const map = new Map({
@@ -104,16 +125,13 @@ const map = new Map({
   view: mapView,
   controls: defaultControls().extend([
     new OverviewMap({
-      collapsed: false, // Mapa guía desplegado por defecto
+      collapsed: false,
       layers: [
         new TileLayer({
           source: new OSM()
         }),
-        caminosLayer // Añadir la capa de caminos al mini mapa
+        caminosLayerGuide // Usamos la capa con estilo line_black
       ]
-    }),
-    new ZoomToExtent({
-      extent: fromLonLat([-8.75, 42.70]).concat(fromLonLat([-7.8, 43.45]))
     })
   ])
 });
@@ -125,6 +143,31 @@ const layerSwitcher = new LayerSwitcher({
   groupSelectStyle: 'group'
 });
 map.addControl(layerSwitcher);
+
+// Crear botón personalizado
+class CustomZoomButton extends Control {
+  constructor(label, extent, tooltip, position) {
+    const button = document.createElement('button');
+    button.innerHTML = label;
+    button.title = tooltip;
+
+    const element = document.createElement('div');
+    element.className = `custom-zoom-button ${position}`;
+    element.appendChild(button);
+
+    super({
+      element: element
+    });
+
+    button.addEventListener('click', () => {
+      map.getView().fit(extent, { duration: 1000 });
+    });
+  }
+}
+
+// Añadir botones personalizados
+map.addControl(new CustomZoomButton('ES', spainExtent, 'Centrar el mapa en España', 'es'));
+map.addControl(new CustomZoomButton('LC', laCorunaExtent, 'Centrar el mapa en La Coruña', 'lc'));
 
 // Ventana emergente para consulta de atributos
 const popupContainer = document.createElement('div');
