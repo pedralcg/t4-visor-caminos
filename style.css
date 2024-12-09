@@ -4,7 +4,7 @@ body {
 }
 
 #menu-bar {
-  background-color: #1a73e8; /* Azul moderno */
+  background-color: #1a73e8;
   color: white;
   padding: 5px 15px;
   display: flex;
@@ -38,57 +38,43 @@ body {
 
 #map {
   width: 100%;
-  height: calc(100vh - 40px); /* Ajuste para compensar la altura del menú */
+  height: calc(100vh - 40px);
 }
 
-/* Botones de zoom personalizados */
 .custom-zoom-button {
   position: absolute;
   left: 2px;
   z-index: 1000;
-  width: 32px; /* Tamaño consistente con los botones predeterminados */
+  width: 32px;
   height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 16px; /* Ajustar tamaño del texto */
+  font-size: 16px;
   font-weight: bold;
-  user-select: none; /* Evitar selección del texto */
+  user-select: none;
   transition: transform 0.2s, background-color 0.2s;
 }
 
-/* Estilo para el efecto de clic */
 .custom-zoom-button:active {
-  transform: scale(0.95); /* Efecto de pulsación */
-  background-color: rgba(0, 0, 0, 0.1); /* Fondo más oscuro temporalmente */
+  transform: scale(0.95);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
-/* Botón específico de España */
 .custom-zoom-button.es {
   top: 60px;
 }
 
-/* Botón específico de La Coruña */
 .custom-zoom-button.lc {
   top: 90px;
 }
 
-/* Iconos opcionales para los botones (como el zoom predeterminado) */
-.custom-zoom-button::before {
-  content: ''; /* Esto podría cambiarse por un ícono si es necesario */
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  background-size: contain;
-  background-repeat: no-repeat;
-}
-
-/* Ejemplo de iconos específicos, puedes personalizarlos: */
-.custom-zoom-button.es::before {
-  background-image: url('path/to/spain-icon.png'); /* Icono para España */
-}
-
-.custom-zoom-button.lc::before {
-  background-image: url('path/to/la-coruna-icon.png'); /* Icono para La Coruña */
+.ol-popup {
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 300px;
 }

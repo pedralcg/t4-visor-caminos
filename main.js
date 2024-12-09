@@ -89,14 +89,14 @@ const lineBlackStyle = new Style({
   stroke: new Stroke({
     color: 'red',
     width: 1,
-    lineDash: [4, 8] // Opcional: líneas punteadas
+    lineDash: [4, 8]
   })
 });
 
 // Capa de caminos de Santiago para el mapa guía
 const caminosLayerGuide = new VectorLayer({
-  source: caminosSource, // Reutilizamos la misma fuente
-  style: lineBlackStyle, // Aplicamos el estilo line_black
+  source: caminosSource,
+  style: lineBlackStyle,
   title: 'Caminos de Santiago (Mapa guía)'
 });
 
@@ -108,8 +108,8 @@ const baseLayerGroup = new LayerGroup({
 
 // Vista del mapa
 const mapView = new View({
-  center: fromLonLat([-3.7, 40]), // Aproximadamente el centro de España
-  zoom: 6.8, // Ajustar para mostrar España completamente
+  center: fromLonLat([-3.7, 40]),
+  zoom: 6.8,
   maxZoom: 15,
   minZoom: 6
 });
@@ -130,7 +130,7 @@ const map = new Map({
         new TileLayer({
           source: new OSM()
         }),
-        caminosLayerGuide // Usamos la capa con estilo line_black
+        caminosLayerGuide
       ]
     })
   ])
@@ -180,14 +180,6 @@ const popup = new Overlay({
 });
 map.addOverlay(popup);
 
-// Estilo personalizado para el popup
-popupContainer.style.backgroundColor = 'white';
-popupContainer.style.border = '1px solid black';
-popupContainer.style.borderRadius = '8px';
-popupContainer.style.padding = '10px';
-popupContainer.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-popupContainer.style.maxWidth = '300px';
-
 // Manejador de clics para mostrar atributos
 map.on('singleclick', (evt) => {
   popup.setPosition(undefined); // Cerrar el popup si no hay selección
@@ -201,7 +193,7 @@ map.on('singleclick', (evt) => {
       </div>
     `;
     popupContainer.innerHTML = atributosHTML;
-    popup.setPosition(evt.coordinate); // Posicionar el popup
-    return true; // Finalizar iteración
+    popup.setPosition(evt.coordinate);
+    return true;
   });
 });
