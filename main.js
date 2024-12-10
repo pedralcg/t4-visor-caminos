@@ -53,6 +53,24 @@ const caminosSource = new VectorSource({
   format: new GeoJSON()
 });
 
+const colores = {
+  "Camino Francés": '#086EC6',
+  "Caminos Andaluces": '#0A1464',
+  "Caminos Catalanes": '#C2A54B',
+  "Caminos de Galicia": '#5518AE',
+  "Caminos del Centro": '#C780D7',
+  "Caminos del Este": '#4C57FC',
+  "Caminos del Norte": '#C45AD0',
+  "Caminos del Sureste": '#5A70C5',
+  "Caminos Insulares": '#9B380C',
+  "Caminos Portugueses": '#285AA1',
+  "Chemins vers Via des Piemonts": '#B00ACE',
+  "Chemins vers Via Turonensis": '#C5B287',
+  "Via Tolosana Arles": '#1A3017',
+  "Voie des Piemonts": '#5F5B10',
+  "Voie Turonensis - Paris": '#30BFB5'
+};
+
 const caminosLayer = new VectorLayer({
   source: caminosSource,
   title: 'Caminos de Santiago',
@@ -75,6 +93,7 @@ const caminosLayer = new VectorLayer({
       "Voie des Piemonts": '#5F5B10',
       "Voie Turonensis - Paris": '#30BFB5'
     };
+
     return new Style({
       stroke: new Stroke({
         color: colores[agrupacion] || 'black',
@@ -197,3 +216,30 @@ map.on('singleclick', (evt) => {
     return true;
   });
 });
+
+// Leyenda dinámica
+function actualizarLeyenda() {
+  const legendDiv = document.getElementById('legend');
+  legendDiv.innerHTML = '<h4>Leyenda</h4>';
+
+  for (const [nombre, color] of Object.entries(colores)) {
+    const item = document.createElement('div');
+    item.style.display = 'flex';
+    item.style.alignItems = 'center';
+    item.style.marginBottom = '5px';
+
+    const colorBox = document.createElement('div');
+    colorBox.style.width = '20px';
+    colorBox.style.height = '10px';
+    colorBox.style.backgroundColor = color;
+    colorBox.style.marginRight = '8px';
+
+    const label = document.createElement('span');
+    label.textContent = nombre;
+
+    item.appendChild(colorBox);
+    item.appendChild(label);
+    legendDiv.appendChild(item);
+  }
+}
+actualizarLeyenda();
