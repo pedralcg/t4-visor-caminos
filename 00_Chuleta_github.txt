@@ -1,0 +1,8 @@
+git checkout -b version0.6
+
+git add *
+
+git commit -m "5º commit - Visor funcional final"
+
+
+git push -u origin version0.6
