@@ -1,8 +1,8 @@
-git checkout -b version0.4
+git checkout -b version0.6
 
 git add *
 
-git commit -m "4º commit - Visor funcional"
+git commit -m "5º commit - Visor funcional final"
 
 
-git push -u origin version0.4
+git push -u origin version0.6

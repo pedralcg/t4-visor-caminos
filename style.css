@@ -100,7 +100,7 @@ body {
   border: 1px solid #ccc;
   border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 50px; /* Desplaza el mapa guía 30px hacia arriba */
+  margin-bottom: 50px;
 }
 
 .ol-scale-line {

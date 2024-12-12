@@ -1,6 +1,8 @@
+// Main.js: Código optimizado y documentado para el visor web basado en OpenLayers.
+
 import './style.css';
 import 'ol/ol.css';
-import 'ol-layerswitcher/dist/ol-layerswitcher.css'; // Estilo para LayerSwitcher
+import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import { Map, View } from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
@@ -15,7 +17,7 @@ import LayerSwitcher from 'ol-layerswitcher';
 import { Style, Stroke } from 'ol/style';
 import Overlay from 'ol/Overlay';
 
-// Paleta de colores
+// Paleta de colores para los diferentes caminos.
 const colores = {
   "Camino Francés": '#086EC6',
   "Caminos Andaluces": '#0A1464',
@@ -34,15 +36,15 @@ const colores = {
   "Voie Turonensis - Paris": '#30BFB5'
 };
 
-// Estilo de selección (amarillo fosforito)
+// Estilo de selección (amarillo fosforito).
 const highlightStyle = new Style({
   stroke: new Stroke({
-    color: '#FFFF00', // Amarillo fosforito
+    color: '#FFFF00',
     width: 4,
   }),
 });
 
-// Estilo predeterminado para las líneas
+// Estilo predeterminado para las líneas basado en el atributo "agrupacion".
 const defaultStyleFunction = (feature) => {
   const agrupacion = feature.get('agrupacion');
   return new Style({
@@ -53,80 +55,80 @@ const defaultStyleFunction = (feature) => {
   });
 };
 
-// Capas base
-const osmBaseLayer = new TileLayer({
-  source: new OSM(),
-  visible: true,
-  title: 'OSM',
-  type: 'base'
-});
-
-const pnoaBaseLayer = new TileLayer({
-  source: new TileWMS({
-    url: 'https://www.ign.es/wms-inspire/pnoa-ma?',
-    params: { LAYERS: 'OI.OrthoimageCoverage', TILED: true },
-    attributions: '© <a href="https://www.ign.es/web/ign/portal">Instituto Geográfico Nacional</a>',
+// Configuración de capas base (OSM, PNOA, MTN50).
+const baseLayers = [
+  new TileLayer({
+    source: new OSM(),
+    visible: true,
+    title: 'OSM',
+    type: 'base',
   }),
-  visible: false,
-  title: 'PNOA',
-  type: 'base'
-});
-
-const mtn50BaseLayer = new TileLayer({
-  source: new TileWMS({
-    url: 'https://www.ign.es/wms/primera-edicion-mtn?',
-    params: { LAYERS: 'MTN50', TILED: true },
-    attributions: '© <a href="https://www.ign.es/web/ign/portal">Instituto Geográfico Nacional</a>',
+  new TileLayer({
+    source: new TileWMS({
+      url: 'https://www.ign.es/wms-inspire/pnoa-ma?',
+      params: { LAYERS: 'OI.OrthoimageCoverage', TILED: true },
+      attributions: '© Instituto Geográfico Nacional',
+    }),
+    visible: false,
+    title: 'PNOA',
+    type: 'base',
   }),
-  visible: false,
-  title: 'MTN50',
-  type: 'base'
+  new TileLayer({
+    source: new TileWMS({
+      url: 'https://www.ign.es/wms/primera-edicion-mtn?',
+      params: { LAYERS: 'MTN50', TILED: true },
+      attributions: '© Instituto Geográfico Nacional',
+    }),
+    visible: false,
+    title: 'MTN50',
+    type: 'base',
+  }),
+];
+
+const baseLayerGroup = new LayerGroup({
+  title: 'Capas Base',
+  layers: baseLayers,
 });
 
-// Capa de los Caminos de Santiago
+// Capa vectorial para los Caminos de Santiago.
 const caminosSource = new VectorSource({
   url: './data/caminos_santiago.geojson',
-  format: new GeoJSON()
+  format: new GeoJSON(),
 });
 
 const caminosLayer = new VectorLayer({
   source: caminosSource,
   title: 'Caminos de Santiago',
-  style: defaultStyleFunction
+  style: defaultStyleFunction,
 });
 
-// Capa de caminos para el mapa guía
+// Capa para el mapa guía.
 const caminosLayerGuide = new VectorLayer({
   source: caminosSource,
   style: new Style({
     stroke: new Stroke({
       color: 'red',
       width: 1,
-      lineDash: [4, 8]
-    })
+      lineDash: [4, 8],
+    }),
   }),
-  title: 'Caminos de Santiago (Mapa guía)'
 });
 
-// Agrupación de capas base
-const baseLayerGroup = new LayerGroup({
-  title: 'Capas Base',
-  layers: [osmBaseLayer, pnoaBaseLayer, mtn50BaseLayer]
-});
-
-// Vista del mapa
+// Configuración de la vista del mapa.
 const mapView = new View({
   center: fromLonLat([-3.7, 40]),
   zoom: 6.8,
   maxZoom: 15,
-  minZoom: 6
+  minZoom: 6,
 });
 
-// Extensiones geográficas
-const spainExtent = transformExtent([-11.0, 35.0, 5.0, 44.0], 'EPSG:4326', 'EPSG:3857');
-const laCorunaExtent = transformExtent([-8.75, 42.70, -7.8, 43.45], 'EPSG:4326', 'EPSG:3857');
+// Extensiones geográficas predefinidas.
+const extents = {
+  spain: transformExtent([-11.0, 35.0, 5.0, 44.0], 'EPSG:4326', 'EPSG:3857'),
+  laCoruna: transformExtent([-8.75, 42.70, -7.8, 43.45], 'EPSG:4326', 'EPSG:3857'),
+};
 
-// Configuración del mapa
+// Configuración del mapa.
 const map = new Map({
   target: 'map',
   layers: [baseLayerGroup, caminosLayer],
@@ -134,32 +136,28 @@ const map = new Map({
   controls: defaultControls().extend([
     new OverviewMap({
       collapsed: false,
-      layers: [
-        new TileLayer({
-          source: new OSM()
-        }),
-        caminosLayerGuide
-      ]
+      layers: [new TileLayer({ source: new OSM() }), caminosLayerGuide],
     }),
     new ScaleLine({
       units: 'metric',
       bar: true,
       steps: 4,
       text: true,
-      minWidth: 140
-    })
-  ])
+      minWidth: 140,
+    }),
+  ]),
 });
 
-// Añadir el control de LayerSwitcher
-const layerSwitcher = new LayerSwitcher({
-  activationMode: 'click',
-  startActive: true,
-  groupSelectStyle: 'group'
-});
-map.addControl(layerSwitcher);
+// Control para alternar capas.
+map.addControl(
+  new LayerSwitcher({
+    activationMode: 'click',
+    startActive: true,
+    groupSelectStyle: 'group',
+  })
+);
 
-// Crear botón personalizado
+// Botones personalizados para centrar el mapa en extensiones predefinidas.
 class CustomZoomButton extends Control {
   constructor(label, extent, tooltip, position) {
     const button = document.createElement('button');
@@ -170,9 +168,7 @@ class CustomZoomButton extends Control {
     element.className = `custom-zoom-button ${position}`;
     element.appendChild(button);
 
-    super({
-      element: element
-    });
+    super({ element });
 
     button.addEventListener('click', () => {
       map.getView().fit(extent, { duration: 1000 });
@@ -180,57 +176,52 @@ class CustomZoomButton extends Control {
   }
 }
 
-// Añadir botones personalizados
-map.addControl(new CustomZoomButton('ES', spainExtent, 'Centrar el mapa en España', 'es'));
-map.addControl(new CustomZoomButton('LC', laCorunaExtent, 'Centrar el mapa en La Coruña', 'lc'));
+// Añadir los botones personalizados al mapa.
+map.addControl(new CustomZoomButton('ES', extents.spain, 'Centrar el mapa en España', 'es'));
+map.addControl(new CustomZoomButton('LC', extents.laCoruna, 'Centrar el mapa en La Coruña', 'lc'));
 
-// Ventana emergente para atributos
+// Configuración del popup para mostrar atributos de las características seleccionadas.
 const popupContainer = document.createElement('div');
 popupContainer.className = 'ol-popup';
+
 const popup = new Overlay({
   element: popupContainer,
   positioning: 'bottom-center',
   stopEvent: false,
-  offset: [0, -10]
+  offset: [0, -10],
 });
+
 map.addOverlay(popup);
 
-// Variable para almacenar la última característica seleccionada
+// Evento de clic en el mapa para manejar la selección de características.
 let selectedFeature = null;
 
-// Evento de clic en el mapa
 map.on('singleclick', (event) => {
   const features = map.getFeaturesAtPixel(event.pixel);
 
-  // Restablecer estilo de la última selección
   if (selectedFeature) {
     selectedFeature.setStyle(defaultStyleFunction(selectedFeature));
-    selectedFeature = null; // Limpiar la selección
+    selectedFeature = null;
   }
 
   if (features && features.length > 0) {
     const feature = features[0];
-    const properties = feature.getProperties();
-
-    // Aplicar el estilo de selección
     feature.setStyle(highlightStyle);
     selectedFeature = feature;
 
-    // Mostrar atributos en el popup
-    const content = `
+    const properties = feature.getProperties();
+    popup.getElement().innerHTML = `
       <strong>Nombre:</strong> ${properties.nombre || 'Desconocido'}<br>
       <strong>Longitud:</strong> ${properties.longitud || 'Desconocida'} km<br>
       <strong>Agrupación:</strong> ${properties.agrupacion || 'Desconocida'}
     `;
-    popup.getElement().innerHTML = content;
     popup.setPosition(event.coordinate);
   } else {
-    // Ocultar el popup si no se selecciona ninguna línea
     popup.setPosition(undefined);
   }
 });
 
-// Leyenda dinámica
+// Actualizar la leyenda dinámicamente.
 function actualizarLeyenda() {
   const legendDiv = document.getElementById('legend');
   legendDiv.innerHTML = '<h3>Leyenda</h3>';
